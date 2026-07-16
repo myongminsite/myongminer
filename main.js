@@ -114,8 +114,8 @@ function renderBoard() {
 
     <main class="board-page">
       <div class="board-note">
-        <span>함께 채우는 최애 기록</span>
-        <span>사진 칸의 <b>+</b>를 눌러 업로드하세요.</span>
+        <span></span>
+        <span><b>+</b>를 눌러 사진을 업로드하세요.</span>
       </div>
 
       <div class="table-wrap">
@@ -130,7 +130,7 @@ function renderBoard() {
         </table>
       </div>
 
-      <button id="add-row" class="add-row"><span>+</span> 내 줄 추가하기</button>
+      <button id="add-row" class="add-row"><span>+</span>추가하기</button>
     </main>
   `;
 
