@@ -29,7 +29,10 @@ input {
   padding: 18vh 0;
 }
 
-.onboarding .eyebrow {
+.onboarding .eyebrow,
+.eyebrow,
+.board-note,
+.share-button {
   display: none;
 }
 
@@ -42,34 +45,6 @@ input {
 .onboarding p {
   color: var(--gray);
   font-size: 14px;
-}
-
-.onboarding form {
-  display: flex;
-  margin-top: 32px;
-  border-bottom: 1px solid var(--black);
-}
-
-.onboarding input {
-  flex: 1;
-  min-width: 0;
-  border: 0;
-  outline: 0;
-  padding: 12px 0;
-  font-size: 15px;
-}
-
-.onboarding button {
-  border: 0;
-  background: transparent;
-  color: var(--key);
-  font-weight: 700;
-}
-
-.eyebrow,
-.board-note,
-.share-button {
-  display: none;
 }
 
 .site-header {
@@ -93,6 +68,7 @@ input {
 
 .table-wrap {
   overflow-x: auto;
+  padding: 0 1px 10px;
 }
 
 table {
@@ -101,7 +77,6 @@ table {
   column-gap: 15px;
   row-gap: 12px;
   width: max-content;
-  min-width: 0;
   margin: 0 auto;
 }
 
@@ -142,15 +117,14 @@ th {
 }
 
 .identity {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 72px;
+  min-height: 90px;
   padding: 0;
   text-align: center;
-  font-size: 11px;
-  font-weight: 500;
-  line-height: 1;
 }
 
 .avatar-upload {
@@ -158,7 +132,7 @@ th {
   width: 60px;
   height: 60px;
   place-items: center;
-  margin: 0 0 9px;
+  margin: 0;
   overflow: hidden;
   cursor: pointer;
   border-radius: 50%;
@@ -171,14 +145,54 @@ th {
   object-fit: cover;
 }
 
-.identity > span {
-  width: 72px;
+.nickname-input,
+.identity > .nickname-text {
+  position: absolute;
+  z-index: 2;
+  top: 7px;
+  left: 31px;
+  display: grid;
+  width: 52px;
+  height: 22px;
+  place-items: center;
   overflow: hidden;
+  border: 0;
+  border-radius: 5px;
+  outline: 0;
+  padding: 0 5px;
+  background: var(--key);
+  color: #ffffff;
+  font-family: 'Pretendard Variable', Pretendard, sans-serif;
+  font-size: 9px;
+  font-weight: 650;
+  line-height: 1;
+  text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-/* 사진 업로드 박스 */
+.nickname-input::placeholder {
+  color: #ffffff;
+  opacity: 0.96;
+}
+
+.delete-row {
+  position: absolute;
+  top: 70px;
+  left: 0;
+  width: 72px;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  color: #999;
+  font-size: 9px;
+  cursor: pointer;
+}
+
+.delete-row:hover {
+  color: var(--key);
+}
+
 .photo-upload {
   display: grid;
   width: 72px;
@@ -217,8 +231,14 @@ th {
   transform: translateY(-1px);
 }
 
-.avatar-upload .plus-icon {
-  color: var(--key);
+.read-only {
+  cursor: default;
+  opacity: 0.82;
+}
+
+.locked-dot {
+  color: #bbb;
+  font-size: 18px;
 }
 
 .add-row {
@@ -229,6 +249,7 @@ th {
   color: var(--black);
   font-size: 12px;
   font-weight: 600;
+  cursor: pointer;
 }
 
 .add-row span {
@@ -254,57 +275,3 @@ th {
     margin-left: 0;
   }
 }
-
-.nickname-input {
-  width: 72px;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  padding: 0;
-  color: #111;
-  font-family: 'Pretendard Variable', Pretendard, sans-serif;
-  font-size: 11px;
-  font-weight: 500;
-  text-align: center;
-}
-
-.nickname-input::placeholder {
-  color: #aaa;
-}
-
-.nickname-text {
-  width: 72px;
-  overflow: hidden;
-  color: #111;
-  font-family: 'Pretendard Variable', Pretendard, sans-serif;
-  font-size: 11px;
-  font-weight: 500;
-  text-align: center;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.delete-row {
-  margin-top: 6px;
-  border: 0;
-  background: transparent;
-  color: #999;
-  font-family: 'Pretendard Variable', Pretendard, sans-serif;
-  font-size: 9px;
-  cursor: pointer;
-}
-
-.delete-row:hover {
-  color: #61cbe0;
-}
-
-.read-only {
-  cursor: default;
-  opacity: 0.82;
-}
-
-.locked-dot {
-  color: #bbb;
-  font-size: 18px;
-}
-
