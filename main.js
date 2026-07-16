@@ -30,7 +30,7 @@ function renderProfile() {
   app.innerHTML = `
     <main class="onboarding">
       <p class="eyebrow">TASTE ARCHIVE</p>
-      <h1>이름을<br>남겨주세요.</h1>
+      <h1>닉네임 입력</h1>
       <p>표에 표시될 닉네임이에요.</p>
 
       <form id="profile-form">
@@ -55,7 +55,7 @@ function renderProfile() {
 async function createBoard() {
   const { data, error } = await supabase
     .from('taste_boards')
-    .insert({ title: '묭민취향표🥢', items })
+    .insert({ title: '묭민취향표 🥢'})
     .select()
     .single();
 
