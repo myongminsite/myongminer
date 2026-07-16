@@ -17,11 +17,8 @@ const items = [
   '민재모에화'
 ];
 
-const state = {
-  boardId: '0f503e73-241f-4cc7-a91c-3f005ba35a7b'
-};
-
 let supabase;
+let currentUser;
 let board;
 let rows = [];
 
@@ -38,14 +35,6 @@ function ready() {
   );
 }
 
-function profileImage(url, name) {
-  if (url) {
-    return `<img src="${escape(url)}" alt="${escape(name)} 프로필 사진">`;
-  }
-
-  return '<span class="plus-icon">+</span>';
-}
-
 function renderSetup() {
   app.innerHTML = `
     <main class="onboarding">
@@ -55,29 +44,78 @@ function renderSetup() {
   `;
 }
 
+function profileMarkup(row, canEdit) {
+  const image = row.avatar_url
+    ? `<img src="${escape(row.avatar_url)}" alt="${escape(row.nickname)} 프로필 사진">`
+    : `<span class="${canEdit ? 'plus-icon' : 'locked-dot'}">${canEdit ? '+' : '—'}</span>`;
+
+  if (!canEdit) {
+    return `<div class="avatar-upload read-only">${image}</div>`;
+  }
+
+  return `
+    <label class="avatar-upload" title="프로필 사진 추가">
+      ${image}
+      <input class="avatar-file" type="file" accept="image/*">
+    </label>
+  `;
+}
+
+function photoMarkup(row, item, index, canEdit) {
+  const image = row.values?.[index]?.image_url
+    ? `<img src="${escape(row.values[index].image_url)}" alt="${escape(item)}">`
+    : `<span class="${canEdit ? 'plus-icon' : 'locked-dot'}">${canEdit ? '+' : '—'}</span>`;
+
+  if (!canEdit) {
+    return `<div class="photo-upload read-only">${image}</div>`;
+  }
+
+  return `
+    <label class="photo-upload" title="${escape(item)} 사진 추가">
+      ${image}
+      <input
+        class="photo-file"
+        data-index="${index}"
+        type="file"
+        accept="image/*"
+      >
+    </label>
+  `;
+}
+
 function renderBoard() {
-  const headers = items
-    .map((item) => `<th>${escape(item)}</th>`)
-    .join('');
+  const headers = items.map((item) => `<th>${escape(item)}</th>`).join('');
 
   const body = rows
-    .map(
-      (row) => `
+    .map((row) => {
+      const canEdit = row.owner_id === currentUser.id;
+
+      return `
         <tr data-id="${row.id}">
           <td class="identity-cell">
             <div class="identity">
-              <label class="avatar-upload" title="프로필 사진 추가">
-                ${profileImage(row.avatar_url, row.nickname)}
-                <input class="avatar-file" type="file" accept="image/*">
-              </label>
+              ${profileMarkup(row, canEdit)}
 
-              <input
-                class="nickname-input"
-                data-id="${row.id}"
-                value="${escape(row.nickname || '')}"
-                maxlength="20"
-                placeholder="닉네임"
-              >
+              ${
+                canEdit
+                  ? `
+                    <input
+                      class="nickname-input"
+                      data-id="${row.id}"
+                      value="${escape(row.nickname || '')}"
+                      maxlength="20"
+                      placeholder="닉네임"
+                    >
+                    <button class="delete-row" data-id="${row.id}">
+                      삭제
+                    </button>
+                  `
+                  : `
+                    <span class="nickname-text">
+                      ${escape(row.nickname || '닉네임')}
+                    </span>
+                  `
+              }
             </div>
           </td>
 
@@ -85,29 +123,14 @@ function renderBoard() {
             .map(
               (item, index) => `
                 <td>
-                  <label class="photo-upload" title="${item} 사진 추가">
-                    ${
-                      row.values?.[index]?.image_url
-                        ? `<img src="${escape(
-                            row.values[index].image_url
-                          )}" alt="${escape(item)}">`
-                        : '<span class="plus-icon">+</span>'
-                    }
-
-                    <input
-                      class="photo-file"
-                      data-index="${index}"
-                      type="file"
-                      accept="image/*"
-                    >
-                  </label>
+                  ${photoMarkup(row, item, index, canEdit)}
                 </td>
               `
             )
             .join('')}
         </tr>
-      `
-    )
+      `;
+    })
     .join('');
 
   app.innerHTML = `
@@ -116,15 +139,9 @@ function renderBoard() {
         <p class="eyebrow">TASTE ARCHIVE</p>
         <h1>${escape(board.title)}</h1>
       </div>
-
-      <button id="share" class="share-button">링크 공유</button>
     </header>
 
     <main class="board-page">
-      <div class="board-note">
-        <span>묭민취향표 🥢</span>
-      </div>
-
       <div class="table-wrap">
         <table>
           <thead>
@@ -134,9 +151,7 @@ function renderBoard() {
             </tr>
           </thead>
 
-          <tbody>
-            ${body}
-          </tbody>
+          <tbody>${body}</tbody>
         </table>
       </div>
 
@@ -147,16 +162,17 @@ function renderBoard() {
   `;
 
   document.querySelector('#add-row').onclick = addRow;
-  document.querySelector('#share').onclick = share;
 
-  document
-    .querySelectorAll('.photo-file, .avatar-file')
-    .forEach((input) => {
-      input.onchange = saveImage;
-    });
+  document.querySelectorAll('.photo-file, .avatar-file').forEach((input) => {
+    input.onchange = saveImage;
+  });
 
   document.querySelectorAll('.nickname-input').forEach((input) => {
     input.onchange = saveNickname;
+  });
+
+  document.querySelectorAll('.delete-row').forEach((button) => {
+    button.onclick = deleteRow;
   });
 }
 
@@ -165,6 +181,7 @@ async function addRow() {
     .from('taste_rows')
     .insert({
       board_id: board.id,
+      owner_id: currentUser.id,
       nickname: '',
       values: items.map(() => ({}))
     })
@@ -192,6 +209,27 @@ async function saveNickname(event) {
   if (error) {
     alert(`닉네임을 저장하지 못했어요: ${error.message}`);
   }
+}
+
+async function deleteRow(event) {
+  const rowId = event.currentTarget.dataset.id;
+
+  if (!confirm('이 줄을 삭제할까요?')) {
+    return;
+  }
+
+  const { error } = await supabase
+    .from('taste_rows')
+    .delete()
+    .eq('id', rowId);
+
+  if (error) {
+    alert(`삭제하지 못했어요: ${error.message}`);
+    return;
+  }
+
+  rows = rows.filter((row) => row.id !== rowId);
+  renderBoard();
 }
 
 async function upload(file, rowId, kind) {
@@ -256,63 +294,65 @@ async function saveImage(event) {
   }
 }
 
-async function share() {
-  try {
-    await navigator.clipboard.writeText(location.origin);
-    alert('사이트 링크를 복사했어요.');
-  } catch {
-    prompt('이 링크를 복사해 공유하세요.', location.origin);
-  }
-}
-
 async function loadBoard() {
-  const [
-    { data: currentBoard, error: boardError },
-    { data: currentRows, error: rowError }
-  ] = await Promise.all([
-    supabase
-      .from('taste_boards')
-      .select()
-.eq('id', state.boardId)
-.limit(1)
-.maybeSingle(),
+  const { data: currentBoard, error: boardError } = await supabase
+    .from('taste_boards')
+    .select()
+    .limit(1)
+    .maybeSingle();
 
-    supabase
-      .from('taste_rows')
-      .select()
-      .eq('board_id', state.boardId)
-      .order('created_at')
-  ]);
-
-  if (boardError || rowError || !currentBoard) {
-    alert(
-      boardError?.message ||
-        rowError?.message ||
-        '취향표를 찾을 수 없어요.'
-    );
+  if (boardError || !currentBoard) {
+    alert(boardError?.message || '취향표를 찾을 수 없어요.');
     return;
   }
 
   board = currentBoard;
-  rows = currentRows;
 
+  const { data: currentRows, error: rowError } = await supabase
+    .from('taste_rows')
+    .select()
+    .eq('board_id', board.id)
+    .order('created_at');
+
+  if (rowError) {
+    alert(rowError.message);
+    return;
+  }
+
+  rows = currentRows;
   renderBoard();
 }
 
 async function start() {
   supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+  const {
+    data: { session }
+  } = await supabase.auth.getSession();
+
+  if (session?.user) {
+    currentUser = session.user;
+  } else {
+    const { data, error } = await supabase.auth.signInAnonymously();
+
+    if (error) {
+      alert(`연결하지 못했어요: ${error.message}`);
+      return;
+    }
+
+    currentUser = data.user;
+  }
+
   await loadBoard();
 
   supabase
-    .channel(`board:${state.boardId}`)
+    .channel('taste-rows')
     .on(
       'postgres_changes',
       {
         event: '*',
         schema: 'public',
-        table: 'taste_rows',
-        filter: `board_id=eq.${state.boardId}`
+        table: 'taste_rows'
       },
       loadBoard
     )
