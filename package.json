@@ -1,0 +1,7 @@
+{
+  "name": "group-taste-table",
+  "private": true,
+  "scripts": { "dev": "vite", "build": "vite build" },
+  "devDependencies": { "vite": "latest" },
+  "dependencies": { "@supabase/supabase-js": "latest" }
+}
