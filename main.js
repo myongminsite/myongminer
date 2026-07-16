@@ -273,8 +273,9 @@ async function loadBoard() {
     supabase
       .from('taste_boards')
       .select()
-      .eq('id', state.boardId)
-      .single(),
+.eq('id', state.boardId)
+.limit(1)
+.maybeSingle()
 
     supabase
       .from('taste_rows')
