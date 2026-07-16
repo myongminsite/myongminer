@@ -263,3 +263,42 @@ th {
   color: #bbb;
   font-size: 18px;
 }
+
+.identity {
+  min-height: 92px;
+}
+
+.avatar-upload {
+  margin-bottom: 8px;
+}
+
+.nickname-input,
+.identity > .nickname-text {
+  position: static;
+  display: block;
+  width: 72px;
+  height: auto;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  outline: 0;
+  padding: 0;
+  background: transparent;
+  color: #111;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 16px;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nickname-input::placeholder {
+  color: #aaa;
+}
+
+.delete-row {
+  position: static;
+  width: 72px;
+  margin-top: 4px;
+}
