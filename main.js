@@ -12,7 +12,7 @@ const items = [
 let supabase, board, rows = [];
 
 const state = {
-  boardId: new URLSearchParams(location.search).get('board'),
+  boardId: 'f03b933e-ce8d-46f8-a0bd-8c78717d7a33',
   profile: JSON.parse(localStorage.getItem('taste-profile') || 'null')
 };
 
