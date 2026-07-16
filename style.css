@@ -1,91 +1,97 @@
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css');
-
 :root {
   --key: #61cbe0;
   --black: #111111;
   --gray: #777777;
   --line: #a8a8a8;
 }
-
-* {
-  box-sizing: border-box;
+{
+box-sizing: border-box;
 }
-
 body {
   margin: 0;
   background: #ffffff;
   color: var(--black);
   font-family: 'Pretendard Variable', Pretendard, sans-serif;
 }
-
 button,
 input {
   font: inherit;
 }
-
 .onboarding {
   width: min(100% - 40px, 460px);
   margin: 0 auto;
   padding: 18vh 0;
 }
-
-.onboarding .eyebrow,
-.eyebrow,
-.board-note,
-.share-button {
+.onboarding .eyebrow {
   display: none;
 }
-
 .onboarding h1 {
   margin: 0 0 12px;
   font-size: 34px;
   letter-spacing: -0.06em;
 }
-
 .onboarding p {
   color: var(--gray);
   font-size: 14px;
 }
-
+.onboarding form {
+  display: flex;
+  margin-top: 32px;
+  border-bottom: 1px solid var(--black);
+}
+.onboarding input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  padding: 12px 0;
+  font-size: 15px;
+}
+.onboarding button {
+  border: 0;
+  background: transparent;
+  color: var(--key);
+  font-weight: 700;
+}
+.eyebrow,
+.board-note,
+.share-button {
+  display: none;
+}
 .site-header {
   display: flex;
   justify-content: center;
   padding: 58px 20px 42px;
 }
-
 .site-header h1 {
   margin: 0;
   font-size: 17px;
   font-weight: 700;
   letter-spacing: -0.05em;
 }
-
 .board-page {
   width: min(100% - 40px, 1160px);
   margin: 0 auto;
   padding-bottom: 100px;
 }
-
 .table-wrap {
   overflow-x: auto;
-  padding: 0 1px 10px;
 }
-
 table {
   display: grid;
   grid-template-columns: repeat(11, 72px);
   column-gap: 15px;
   row-gap: 12px;
   width: max-content;
+  min-width: 0;
   margin: 0 auto;
 }
-
 thead,
 tbody,
 tr {
   display: contents;
 }
-
 th,
 td,
 .identity-head,
@@ -98,7 +104,6 @@ td,
   border: 0;
   background: transparent;
 }
-
 th {
   display: flex;
   align-items: end;
@@ -111,88 +116,43 @@ th {
   text-align: center;
   white-space: nowrap;
 }
-
 .identity-head {
   color: transparent;
 }
-
 .identity {
-  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 72px;
-  min-height: 90px;
   padding: 0;
   text-align: center;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
 }
-
 .avatar-upload {
   display: grid;
   width: 60px;
   height: 60px;
   place-items: center;
-  margin: 0;
+  margin: 0 0 9px;
   overflow: hidden;
   cursor: pointer;
   border-radius: 50%;
   background: var(--black);
 }
-
 .avatar-upload img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
-
-.nickname-input,
-.identity > .nickname-text {
-  position: absolute;
-  z-index: 2;
-  top: 7px;
-  left: 31px;
-  display: grid;
-  width: 52px;
-  height: 22px;
-  place-items: center;
+.identity > span {
+  width: 72px;
   overflow: hidden;
-  border: 0;
-  border-radius: 5px;
-  outline: 0;
-  padding: 0 5px;
-  background: var(--key);
-  color: #ffffff;
-  font-family: 'Pretendard Variable', Pretendard, sans-serif;
-  font-size: 9px;
-  font-weight: 650;
-  line-height: 1;
-  text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
-.nickname-input::placeholder {
-  color: #ffffff;
-  opacity: 0.96;
-}
-
-.delete-row {
-  position: absolute;
-  top: 70px;
-  left: 0;
-  width: 72px;
-  margin: 0;
-  border: 0;
-  background: transparent;
-  color: #999;
-  font-size: 9px;
-  cursor: pointer;
-}
-
-.delete-row:hover {
-  color: var(--key);
-}
-
+/* 사진 업로드 박스 */
 .photo-upload {
   display: grid;
   width: 72px;
@@ -204,23 +164,19 @@ th {
   background: #fff;
   transition: border-color 0.15s ease, transform 0.15s ease;
 }
-
 .photo-upload:hover {
   border-color: var(--key);
   transform: translateY(-2px);
 }
-
 .photo-upload img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
-
 .photo-upload input,
 .avatar-upload input {
   display: none;
 }
-
 .plus-icon {
   display: block;
   color: var(--key);
@@ -230,17 +186,9 @@ th {
   line-height: 1;
   transform: translateY(-1px);
 }
-
-.read-only {
-  cursor: default;
-  opacity: 0.82;
+.avatar-upload .plus-icon {
+  color: var(--key);
 }
-
-.locked-dot {
-  color: #bbb;
-  font-size: 18px;
-}
-
 .add-row {
   margin-top: 40px;
   margin-left: max(0px, calc(50% - 471px));
@@ -249,29 +197,69 @@ th {
   color: var(--black);
   font-size: 12px;
   font-weight: 600;
-  cursor: pointer;
 }
-
 .add-row span {
   margin-right: 7px;
   color: var(--key);
   font-size: 16px;
 }
-
 @media (max-width: 760px) {
   .site-header {
     padding-top: 38px;
   }
-
   .board-page {
     width: calc(100% - 24px);
   }
-
   table {
     margin: 0;
   }
-
   .add-row {
     margin-left: 0;
   }
+}
+.nickname-input {
+  width: 72px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  padding: 0;
+  color: #111;
+  font-family: 'Pretendard Variable', Pretendard, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  text-align: center;
+}
+.nickname-input::placeholder {
+  color: #aaa;
+}
+.nickname-text {
+  width: 72px;
+  overflow: hidden;
+  color: #111;
+  font-family: 'Pretendard Variable', Pretendard, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.delete-row {
+  margin-top: 6px;
+  border: 0;
+  background: transparent;
+  color: #999;
+  font-family: 'Pretendard Variable', Pretendard, sans-serif;
+  font-size: 9px;
+  cursor: pointer;
+}
+.delete-row:hover {
+  color: #61cbe0;
+}
+.read-only {
+  cursor: default;
+  opacity: 0.82;
+}
+.locked-dot {
+  color: #bbb;
+  font-size: 18px;
 }
