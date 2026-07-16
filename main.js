@@ -3,70 +3,269 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
 import './style.css';
 
 const app = document.querySelector('#app');
-const blankItems = Array.from({ length: 11 }, (_, i) => `목록 ${i + 1}`);
+
+const items = [
+  '최애', '입덕계기', '최애떡밥', '최애릴스', '셀카',
+  '투샷', '2차', '관계성', '용훈모에화', '민재모에화'
+];
+
 let supabase, board, rows = [];
-const state = { boardId: new URLSearchParams(location.search).get('board'), profile: JSON.parse(localStorage.getItem('taste-profile') || 'null') };
 
-function escape(text = '') { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
-function initials(name = '') { return name.trim().slice(0, 1) || '?'; }
-function ready() { return !SUPABASE_URL.startsWith('YOUR_') && !SUPABASE_ANON_KEY.startsWith('YOUR_'); }
+const state = {
+  boardId: new URLSearchParams(location.search).get('board'),
+  profile: JSON.parse(localStorage.getItem('taste-profile') || 'null')
+};
 
-function renderSetup() {
-  app.innerHTML = `<main class="mx-auto max-w-xl px-5 py-20"><p class="text-sm font-semibold text-violet-600">GROUP TASTE TABLE</p><h1 class="mt-2 text-4xl font-bold">우리의 취향표</h1><p class="mt-4 leading-7 text-stone-600">Supabase 연결 정보가 아직 없습니다. <code>src/config.js</code>에 프로젝트 URL과 anon key를 입력한 뒤 새로고침해 주세요.</p></main>`;
-}
+const escape = (value = '') => {
+  const el = document.createElement('div');
+  el.textContent = value;
+  return el.innerHTML;
+};
+
+const ready = () =>
+  !SUPABASE_URL.startsWith('YOUR_') &&
+  !SUPABASE_ANON_KEY.startsWith('YOUR_');
+
 function renderProfile() {
-  app.innerHTML = `<main class="mx-auto max-w-md px-5 py-20"><p class="text-sm font-semibold text-violet-600">WELCOME</p><h1 class="mt-2 text-3xl font-bold">표에 표시할 이름을 알려주세요</h1><form id="profile-form" class="mt-8 space-y-4"><input required name="name" maxlength="30" placeholder="닉네임" class="w-full rounded-xl border border-stone-300 px-4 py-3 outline-violet-500"><input name="avatar" type="url" placeholder="프로필 사진 URL (선택)" class="w-full rounded-xl border border-stone-300 px-4 py-3 outline-violet-500"><button class="w-full rounded-xl bg-violet-600 px-4 py-3 font-semibold text-white">시작하기</button></form></main>`;
-  document.querySelector('#profile-form').onsubmit = e => { e.preventDefault(); state.profile = Object.fromEntries(new FormData(e.target)); localStorage.setItem('taste-profile', JSON.stringify(state.profile)); start(); };
+  app.innerHTML = `
+    <main class="onboarding">
+      <p class="eyebrow">TASTE ARCHIVE</p>
+      <h1>이름을<br>남겨주세요.</h1>
+      <p>표에 표시될 닉네임이에요.</p>
+
+      <form id="profile-form">
+        <input required autofocus maxlength="20" name="name" placeholder="닉네임 입력">
+        <button>취향표 열기 <span>→</span></button>
+      </form>
+    </main>
+  `;
+
+  document.querySelector('#profile-form').onsubmit = (event) => {
+    event.preventDefault();
+
+    state.profile = {
+      name: new FormData(event.currentTarget).get('name').trim()
+    };
+
+    localStorage.setItem('taste-profile', JSON.stringify(state.profile));
+    start();
+  };
 }
-function renderHome() {
-  app.innerHTML = `<main class="mx-auto max-w-xl px-5 py-20"><p class="text-sm font-semibold text-violet-600">${escape(state.profile.name)}님의 공간</p><h1 class="mt-2 text-4xl font-bold">새 취향표를 만들어요</h1><p class="mt-4 text-stone-600">만든 뒤 링크를 공유하면 친구들도 같은 표에 한 줄씩 추가할 수 있어요.</p><button id="create" class="mt-8 rounded-xl bg-violet-600 px-5 py-3 font-semibold text-white">새 취향표 만들기</button></main>`;
-  document.querySelector('#create').onclick = createBoard;
-}
+
 async function createBoard() {
-  const title = prompt('취향표 제목을 입력해 주세요.', '우리의 취향표'); if (!title) return;
-  const { data, error } = await supabase.from('taste_boards').insert({ title, items: blankItems }).select().single();
-  if (error) return alert(error.message); location.href = `${location.pathname}?board=${data.id}`;
+  const { data, error } = await supabase
+    .from('taste_boards')
+    .insert({ title: '우리의 취향표', items })
+    .select()
+    .single();
+
+  if (error) return alert(error.message);
+
+  location.replace(`${location.pathname}?board=${data.id}`);
 }
-function avatar(row) { return row.avatar_url ? `<img class="avatar" src="${escape(row.avatar_url)}" alt="">` : `<span class="avatar avatar-letter">${escape(initials(row.nickname))}</span>`; }
+
+function profileImage(url, name) {
+  if (url) {
+    return `<img src="${escape(url)}" alt="${escape(name)} 프로필 사진">`;
+  }
+
+  return '<span class="plus-icon">+</span>';
+}
+
 function renderBoard() {
-  const headers = board.items.map((item, i) => `<th><input class="header-input" data-index="${i}" value="${escape(item)}" aria-label="목록 ${i + 1} 제목"></th>`).join('');
-  const body = rows.map(row => `<tr data-id="${row.id}"><td class="sticky left-0 z-10 bg-white"><div class="flex min-w-40 items-center gap-2">${avatar(row)}<input class="nick" value="${escape(row.nickname)}"></div></td>${board.items.map((_, i) => `<td><label class="image-cell">${row.values?.[i]?.image_url ? `<img src="${escape(row.values[i].image_url)}" alt="">` : '<span>사진 추가</span>'}<input class="photo" data-index="${i}" type="file" accept="image/*"></label></td>`).join('')}</tr>`).join('');
-  app.innerHTML = `<header class="border-b bg-white"><div class="mx-auto flex max-w-[1800px] items-center justify-between gap-4 px-5 py-4"><div><p class="text-xs font-bold text-violet-600">GROUP TASTE TABLE</p><h1 class="text-xl font-bold">${escape(board.title)}</h1></div><div class="flex gap-2"><button id="share" class="button-secondary">링크 공유</button><button id="save" class="button-primary">저장</button></div></div></header><main class="mx-auto max-w-[1800px] p-5"><p class="mb-4 text-sm text-stone-500">사진 칸을 눌러 각 목록의 사진을 올리고, 행을 추가해 주세요.</p><div class="table-wrap"><table><thead><tr><th class="sticky left-0 z-20 bg-stone-100">프로필 · 닉네임</th>${headers}</tr></thead><tbody>${body}</tbody></table></div><button id="add-row" class="mt-4 button-secondary">+ 내 행 추가</button></main>`;
+  const headers = items.map((item) => `<th>${escape(item)}</th>`).join('');
+
+  const body = rows.map((row) => `
+    <tr data-id="${row.id}">
+      <td class="identity-cell">
+        <div class="identity">
+          <label class="avatar-upload" title="프로필 사진 추가">
+            ${profileImage(row.avatar_url, row.nickname)}
+            <input class="avatar-file" type="file" accept="image/*">
+          </label>
+          <span>${escape(row.nickname)}</span>
+        </div>
+      </td>
+
+      ${items.map((item, index) => `
+        <td>
+          <label class="photo-upload" title="${item} 사진 추가">
+            ${
+              row.values?.[index]?.image_url
+                ? `<img src="${escape(row.values[index].image_url)}" alt="${item}">`
+                : '<span class="plus-icon">+</span>'
+            }
+            <input class="photo-file" data-index="${index}" type="file" accept="image/*">
+          </label>
+        </td>
+      `).join('')}
+    </tr>
+  `).join('');
+
+  app.innerHTML = `
+    <header class="site-header">
+      <div>
+        <p class="eyebrow">TASTE ARCHIVE</p>
+        <h1>${escape(board.title)}</h1>
+      </div>
+
+      <button id="share" class="share-button">링크 공유 <span>↗</span></button>
+    </header>
+
+    <main class="board-page">
+      <div class="board-note">
+        <span>함께 채우는 최애 기록</span>
+        <span>사진 칸의 <b>+</b>를 눌러 업로드하세요.</span>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="identity-head">프로필</th>
+              ${headers}
+            </tr>
+          </thead>
+          <tbody>${body}</tbody>
+        </table>
+      </div>
+
+      <button id="add-row" class="add-row"><span>+</span> 내 줄 추가하기</button>
+    </main>
+  `;
+
   document.querySelector('#add-row').onclick = addRow;
-  document.querySelector('#save').onclick = save;
-  document.querySelector('#share').onclick = async () => { await navigator.clipboard.writeText(location.href); alert('공유 링크를 복사했어요.'); };
+  document.querySelector('#share').onclick = share;
+
+  document.querySelectorAll('.photo-file, .avatar-file').forEach((input) => {
+    input.onchange = saveImage;
+  });
 }
+
 async function addRow() {
-  const { data, error } = await supabase.from('taste_rows').insert({ board_id: board.id, nickname: state.profile.name, avatar_url: state.profile.avatar || null, values: blankItems.map(() => ({})) }).select().single();
-  if (error) return alert(error.message); rows.push(data); renderBoard();
+  const { data, error } = await supabase
+    .from('taste_rows')
+    .insert({
+      board_id: board.id,
+      nickname: state.profile.name,
+      values: items.map(() => ({}))
+    })
+    .select()
+    .single();
+
+  if (error) return alert(error.message);
+
+  rows.push(data);
+  renderBoard();
 }
-async function upload(file, boardId, rowId, index) {
-  const ext = file.name.split('.').pop(); const path = `${boardId}/${rowId}-${index}.${ext}`;
-  const { error } = await supabase.storage.from('taste-images').upload(path, file, { upsert: true }); if (error) throw error;
+
+async function upload(file, rowId, kind) {
+  const ext = file.name.split('.').pop() || 'jpg';
+  const path = `${board.id}/${rowId}-${kind}.${ext}`;
+
+  const { error } = await supabase.storage
+    .from('taste-images')
+    .upload(path, file, { upsert: true });
+
+  if (error) throw error;
+
   return supabase.storage.from('taste-images').getPublicUrl(path).data.publicUrl;
 }
-async function save() {
-  const headers = [...document.querySelectorAll('.header-input')].map(input => input.value.trim() || '이름 없음');
-  const saves = [...document.querySelectorAll('tbody tr')].map(async tr => {
-    const row = rows.find(r => r.id === tr.dataset.id); const values = [...(row.values || blankItems.map(() => ({})))];
-    for (const input of tr.querySelectorAll('.photo')) if (input.files[0]) values[input.dataset.index] = { image_url: await upload(input.files[0], board.id, row.id, input.dataset.index) };
-    return supabase.from('taste_rows').update({ nickname: tr.querySelector('.nick').value.trim() || '익명', values }).eq('id', row.id);
-  });
-  const results = await Promise.all([...saves, supabase.from('taste_boards').update({ items: headers }).eq('id', board.id)]);
-  const error = results.find(r => r.error)?.error; if (error) return alert(error.message); await loadBoard(); alert('저장했어요.');
+
+async function saveImage(event) {
+  const input = event.currentTarget;
+  const file = input.files?.[0];
+
+  if (!file) return;
+
+  const row = rows.find(
+    (entry) => entry.id === input.closest('tr').dataset.id
+  );
+
+  try {
+    const isAvatar = input.classList.contains('avatar-file');
+    const index = Number(input.dataset.index);
+
+    const url = await upload(
+      file,
+      row.id,
+      isAvatar ? 'avatar' : index
+    );
+
+    const values = [...(row.values || items.map(() => ({})))];
+
+    if (!isAvatar) {
+      values[index] = { image_url: url };
+    }
+
+    const { data, error } = await supabase
+      .from('taste_rows')
+      .update(isAvatar ? { avatar_url: url } : { values })
+      .eq('id', row.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    rows = rows.map((entry) => entry.id === row.id ? data : entry);
+    renderBoard();
+  } catch (error) {
+    alert(`업로드하지 못했어요: ${error.message}`);
+  }
 }
+
+async function share() {
+  try {
+    await navigator.clipboard.writeText(location.href);
+    alert('공유 링크를 복사했어요.');
+  } catch {
+    prompt('이 링크를 복사해 공유하세요.', location.href);
+  }
+}
+
 async function loadBoard() {
-  const [{ data: currentBoard, error }, { data: currentRows, error: rowsError }] = await Promise.all([supabase.from('taste_boards').select().eq('id', state.boardId).single(), supabase.from('taste_rows').select().eq('board_id', state.boardId).order('created_at')]);
-  if (error || rowsError || !currentBoard) return alert(error?.message || rowsError?.message || '표를 찾을 수 없어요.'); board = currentBoard; rows = currentRows; renderBoard();
+  const [{ data: currentBoard, error }, { data: currentRows, error: rowError }] =
+    await Promise.all([
+      supabase.from('taste_boards').select().eq('id', state.boardId).single(),
+      supabase.from('taste_rows').select().eq('board_id', state.boardId).order('created_at')
+    ]);
+
+  if (error || rowError || !currentBoard) {
+    return alert(error?.message || rowError?.message || '취향표를 찾을 수 없어요.');
+  }
+
+  board = currentBoard;
+  rows = currentRows;
+
+  renderBoard();
 }
+
 async function start() {
   if (!state.profile) return renderProfile();
+
   supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  const { error } = await supabase.auth.signInAnonymously(); if (error) return alert(`익명 로그인 실패: ${error.message}`);
-  if (!state.boardId) return renderHome(); await loadBoard();
-  supabase.channel(`board:${state.boardId}`)
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'taste_rows', filter: `board_id=eq.${state.boardId}` }, loadBoard)
-    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'taste_boards', filter: `id=eq.${state.boardId}` }, loadBoard)
+
+  const { error } = await supabase.auth.signInAnonymously();
+
+  if (error) return alert(`연결하지 못했어요: ${error.message}`);
+
+  if (!state.boardId) return createBoard();
+
+  await loadBoard();
+
+  supabase
+    .channel(`board:${state.boardId}`)
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'taste_rows',
+        filter: `board_id=eq.${state.boardId}`
+      },
+      loadBoard
+    )
     .subscribe();
 }
-ready() ? start() : renderSetup();
+
+ready() ? start() : renderProfile();
