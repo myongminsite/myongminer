@@ -1,4 +1,11 @@
-@import url('https://fonts.googleapis.com/css2?family=Gowun+Dodum:wght@400;700&display=swap');
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css');
+
+:root {
+  --key: #61cbe0;
+  --black: #111111;
+  --gray: #777777;
+  --line: #a8a8a8;
+}
 
 * {
   box-sizing: border-box;
@@ -6,14 +13,57 @@
 
 body {
   margin: 0;
-  background: #fff;
-  color: #111;
-  font-family: 'Gowun Dodum', sans-serif;
+  background: #ffffff;
+  color: var(--black);
+  font-family: 'Pretendard Variable', Pretendard, sans-serif;
 }
 
 button,
 input {
   font: inherit;
+}
+
+.onboarding {
+  width: min(100% - 40px, 460px);
+  margin: 0 auto;
+  padding: 18vh 0;
+}
+
+.onboarding .eyebrow {
+  display: none;
+}
+
+.onboarding h1 {
+  margin: 0 0 12px;
+  font-size: 34px;
+  letter-spacing: -0.06em;
+}
+
+.onboarding p {
+  color: var(--gray);
+  font-size: 14px;
+}
+
+.onboarding form {
+  display: flex;
+  margin-top: 32px;
+  border-bottom: 1px solid var(--black);
+}
+
+.onboarding input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  padding: 12px 0;
+  font-size: 15px;
+}
+
+.onboarding button {
+  border: 0;
+  background: transparent;
+  color: var(--key);
+  font-weight: 700;
 }
 
 .eyebrow,
@@ -25,7 +75,7 @@ input {
 .site-header {
   display: flex;
   justify-content: center;
-  padding: 52px 20px 35px;
+  padding: 58px 20px 42px;
 }
 
 .site-header h1 {
@@ -37,160 +87,33 @@ input {
 
 .site-header h1::after {
   content: ' ✎';
-  margin-left: 4px;
-  color: #e68b8d;
+  color: var(--key);
 }
 
 .board-page {
-  width: min(100% - 40px, 1120px);
+  width: min(100% - 40px, 1160px);
   margin: 0 auto;
-  padding: 0 0 100px;
+  padding-bottom: 100px;
 }
 
 .table-wrap {
   overflow-x: auto;
-  background: transparent;
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
 }
 
 table {
-  width: 100%;
-  min-width: 980px;
-  border-collapse: separate;
-  border-spacing: 8px 0;
-}
-
-th,
-td {
-  min-width: 72px;
-  padding: 0;
-  border: 0;
-}
-
-th {
-  height: 27px;
-  background: transparent;
-  color: #222;
-  font-size: 10px;
-  font-weight: 700;
-  text-align: center;
-  white-space: nowrap;
-}
-
-.identity-head {
-  min-width: 105px;
-  color: transparent;
-}
-
-.identity-cell {
-  min-width: 105px;
-  background: transparent;
-}
-
-.identity {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  min-width: 100px;
-  color: #222;
-  font-size: 11px;
-  font-weight: 400;
-}
-
-.avatar-upload {
   display: grid;
-  width: 54px;
-  height: 54px;
-  place-items: center;
-  overflow: hidden;
-  cursor: pointer;
-  border-radius: 50%;
-  background: #111;
-}
-
-.avatar-upload input,
-.photo-upload input {
-  display: none;
-}
-
-.avatar-upload img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.avatar-upload .plus-icon {
-  color: #fff;
-}
-
-.photo-upload {
-  display: grid;
-  width: 72px;
-  height: 72px;
-  place-items: center;
-  overflow: hidden;
-  cursor: pointer;
-  border: 1px solid #8f8f8f;
-  background: #fff;
-  transition: background 0.15s ease, transform 0.15s ease;
-}
-
-.photo-upload:hover {
-  background: #f5f5f5;
-  transform: translateY(-2px);
-}
-
-.photo-upload img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.plus-icon {
-  color: #777;
-  font-size: 25px;
-  font-weight: 400;
-  line-height: 1;
-}
-
-.add-row {
-  margin: 42px 0 0 5px;
-  border: 0;
-  background: transparent;
-  color: #111;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.add-row span {
-  margin-right: 7px;
-  font-size: 14px;
-}
-
-@media (max-width: 700px) {
-  .site-header {
-    padding-top: 35px;
-  }
-
-  .board-page {
-    width: min(100% - 24px, 1120px);
-  }
-}
-
-.table-wrap {
-  display: flex;
-  justify-content: center;
-}
-
-table {
-  width: auto;
+  grid-template-columns: repeat(11, 72px);
+  column-gap: 15px;
+  row-gap: 12px;
+  width: max-content;
   min-width: 0;
-  table-layout: fixed;
-  border-spacing: 15px 0;
+  margin: 0 auto;
+}
+
+thead,
+tbody,
+tr {
+  display: contents;
 }
 
 th,
@@ -200,32 +123,139 @@ td,
   width: 72px;
   min-width: 72px;
   max-width: 72px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
 }
 
 th {
-  padding: 0;
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  height: 18px;
+  color: #444;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
   text-align: center;
+  white-space: nowrap;
+}
+
+.identity-head {
+  color: transparent;
 }
 
 .identity {
-  width: 72px;
-  min-width: 72px;
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  width: 72px;
+  padding: 0;
   text-align: center;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
 }
 
 .avatar-upload {
-  width: 54px;
-  height: 54px;
-  margin: 0 auto;
+  display: grid;
+  width: 60px;
+  height: 60px;
+  place-items: center;
+  margin: 0 0 9px;
+  overflow: hidden;
+  cursor: pointer;
+  border-radius: 50%;
+  background: var(--black);
 }
 
-.identity span {
-  display: block;
+.avatar-upload img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.identity > span {
   width: 72px;
-  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 사진 업로드 박스 */
+.photo-upload {
+  display: grid;
+  width: 72px;
+  height: 72px;
+  place-items: center;
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid var(--line);
+  background: #fff;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.photo-upload:hover {
+  border-color: var(--key);
+  transform: translateY(-2px);
+}
+
+.photo-upload img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-upload input,
+.avatar-upload input {
+  display: none;
+}
+
+.plus-icon {
+  display: block;
+  color: var(--key);
+  font-family: Arial, sans-serif;
+  font-size: 26px;
+  font-weight: 300;
+  line-height: 1;
+  transform: translateY(-1px);
+}
+
+.avatar-upload .plus-icon {
+  color: var(--key);
 }
 
 .add-row {
-  margin-left: max(0px, calc((100% - 942px) / 2));
+  margin-top: 40px;
+  margin-left: max(0px, calc(50% - 471px));
+  border: 0;
+  background: transparent;
+  color: var(--black);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.add-row span {
+  margin-right: 7px;
+  color: var(--key);
+  font-size: 16px;
+}
+
+@media (max-width: 760px) {
+  .site-header {
+    padding-top: 38px;
+  }
+
+  .board-page {
+    width: calc(100% - 24px);
+  }
+
+  table {
+    margin: 0;
+  }
+
+  .add-row {
+    margin-left: 0;
+  }
 }
