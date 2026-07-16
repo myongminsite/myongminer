@@ -275,7 +275,7 @@ async function loadBoard() {
       .select()
 .eq('id', state.boardId)
 .limit(1)
-.maybeSingle()
+.maybeSingle(),
 
     supabase
       .from('taste_rows')
