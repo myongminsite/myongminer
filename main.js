@@ -238,15 +238,23 @@ async function upload(file, rowId, kind) {
 
   const { error } = await supabase.storage
     .from('taste-images')
-    .upload(path, file, { upsert: true });
+    .upload(path, file, {
+      upsert: true,
+      cacheControl: '0',
+      contentType: file.type
+    });
 
   if (error) {
     throw error;
   }
 
-  return supabase.storage
+  const {
+    data: { publicUrl }
+  } = supabase.storage
     .from('taste-images')
-    .getPublicUrl(path).data.publicUrl;
+    .getPublicUrl(path);
+
+  return `${publicUrl}?v=${Date.now()}`;
 }
 
 async function saveImage(event) {
