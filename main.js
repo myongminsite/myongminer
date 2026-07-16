@@ -301,13 +301,6 @@ async function loadBoard() {
 async function start() {
   supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  const { error } = await supabase.auth.signInAnonymously();
-
-  if (error) {
-    alert(`연결하지 못했어요: ${error.message}`);
-    return;
-  }
-
   await loadBoard();
 
   supabase
