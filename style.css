@@ -180,3 +180,52 @@ th {
     width: min(100% - 24px, 1120px);
   }
 }
+
+.table-wrap {
+  display: flex;
+  justify-content: center;
+}
+
+table {
+  width: auto;
+  min-width: 0;
+  table-layout: fixed;
+  border-spacing: 15px 0;
+}
+
+th,
+td,
+.identity-head,
+.identity-cell {
+  width: 72px;
+  min-width: 72px;
+  max-width: 72px;
+}
+
+th {
+  padding: 0;
+  text-align: center;
+}
+
+.identity {
+  width: 72px;
+  min-width: 72px;
+  align-items: center;
+  text-align: center;
+}
+
+.avatar-upload {
+  width: 54px;
+  height: 54px;
+  margin: 0 auto;
+}
+
+.identity span {
+  display: block;
+  width: 72px;
+  text-align: center;
+}
+
+.add-row {
+  margin-left: max(0px, calc((100% - 942px) / 2));
+}
