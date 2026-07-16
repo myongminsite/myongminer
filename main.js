@@ -55,7 +55,7 @@ function renderProfile() {
 async function createBoard() {
   const { data, error } = await supabase
     .from('taste_boards')
-    .insert({ title: '우리의 취향표', items })
+    .insert({ title: '묭민취향표🥢', items })
     .select()
     .single();
 
