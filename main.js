@@ -18,7 +18,7 @@ const items = [
 ];
 
 const state = {
-  boardId: 'f03b933e-ce8d-46f8-a0bd-8c78717d7a33'
+  boardId: '0f503e73-241f-4cc7-a91c-3f005ba35a7b'
 };
 
 let supabase;
