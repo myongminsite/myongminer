@@ -307,3 +307,46 @@ th {
   color: #bbb;
   font-size: 18px;
 }
+
+.identity {
+  position: relative;
+  min-height: 88px;
+  overflow: visible;
+}
+
+.nickname-input,
+.nickname-text {
+  position: absolute;
+  top: -5px;
+  left: 52px;
+  z-index: 3;
+  display: grid;
+  width: 74px;
+  height: 30px;
+  place-items: center;
+  overflow: hidden;
+  border: 0;
+  border-radius: 7px;
+  outline: 0;
+  background: #61cbe0;
+  color: #fff;
+  font-family: 'Pretendard Variable', Pretendard, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nickname-input::placeholder {
+  color: #fff;
+  opacity: 0.85;
+}
+
+.delete-row {
+  position: absolute;
+  top: 68px;
+  left: 0;
+  width: 72px;
+  margin: 0;
+}
