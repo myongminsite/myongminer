@@ -85,11 +85,6 @@ input {
   letter-spacing: -0.05em;
 }
 
-.site-header h1::after {
-  content: ' ✎';
-  color: var(--key);
-}
-
 .board-page {
   width: min(100% - 40px, 1160px);
   margin: 0 auto;
