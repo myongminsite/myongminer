@@ -232,6 +232,53 @@ async function deleteRow(event) {
   renderBoard();
 }
 
+async function compressImage(file) {
+  if (!file.type.startsWith('image/') || file.type === 'image/gif') {
+    return file;
+  }
+
+  const source = await new Promise((resolve, reject) => {
+    const image = new Image();
+    const url = URL.createObjectURL(file);
+
+    image.onload = () => {
+      URL.revokeObjectURL(url);
+      resolve(image);
+    };
+
+    image.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error('사진을 읽지 못했어요.'));
+    };
+
+    image.src = url;
+  });
+
+  const maxSize = 960;
+  const scale = Math.min(1, maxSize / Math.max(source.width, source.height));
+  const width = Math.max(1, Math.round(source.width * scale));
+  const height = Math.max(1, Math.round(source.height * scale));
+
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  canvas.getContext('2d').drawImage(source, 0, 0, width, height);
+
+  const blob = await new Promise((resolve) => {
+    canvas.toBlob(resolve, 'image/webp', 0.8);
+  });
+
+  if (!blob) {
+    return file;
+  }
+
+  const filename = file.name.replace(/\.[^/.]+$/, '') || 'image';
+
+  return new File([blob], `${filename}.webp`, {
+    type: 'image/webp'
+  });
+}
+
 async function upload(file, rowId, kind) {
   const extension = file.name.split('.').pop() || 'jpg';
   const path = `${board.id}/${rowId}-${kind}.${extension}`;
@@ -240,7 +287,7 @@ async function upload(file, rowId, kind) {
     .from('taste-images')
     .upload(path, file, {
       upsert: true,
-      cacheControl: '0',
+      cacheControl: '31536000',
       contentType: file.type
     });
 
@@ -272,8 +319,10 @@ async function saveImage(event) {
     const isAvatar = input.classList.contains('avatar-file');
     const index = Number(input.dataset.index);
 
+    const compressedFile = await compressImage(file);
+
     const imageUrl = await upload(
-      file,
+      compressedFile,
       row.id,
       isAvatar ? 'avatar' : index
     );
